@@ -5,17 +5,24 @@ require ("../db/mySQLDAO.php");
 $config = parse_ini_file("../../../../mySQLApp.ini");
 $returnValue = array();
 
-if(empty(filter_input(INPUT_GET,'userEmail')) || empty(filter_input(INPUT_GET,'userPassword')))
+//decod json input to array
+$input = json_decode(file_get_contents('php://input'),true);
+
+//convert input values to variables
+$userEmail = htmlentities($input["userEmail"]);
+$userPassword = htmlentities($input["userPassword"]);
+
+//check for all required values
+if(($userEmail == null) || ($userPassword == null))
 {
     $returnValue["Status"]="400";
     $returnValue["Message"]="Missing required information";
     echo json_encode($returnValue);
     return;
     
-}
+} 
 
-$userEmail = htmlentities(filter_input(INPUT_GET,'userEmail'));
-$userPassword = htmlentities(filter_input(INPUT_GET,'userPassword'));
+
 
 //get connection variables from ini data
 $dbhost = trim($config["dbhost"]);

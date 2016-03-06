@@ -7,8 +7,17 @@ $config = parse_ini_file("../../../../mySQLApp.ini");
 
 $returnValue = array();
 
+//decod json input to array
+$input = json_decode(file_get_contents('php://input'),true);
+
+//convert input values to variables
+$userEmail = htmlentities($input["userEmail"]);
+$userPassword = htmlentities($input["userPassword"]);
+$userFirstName = htmlentities($input["userFirstName"]);
+$userLastName = htmlentities($input["userLastName"]);
+
 //check for all required values
-if(empty(filter_input(INPUT_GET,'userEmail')) || empty(filter_input(INPUT_GET,'userPassword')) || empty(filter_input(INPUT_GET,'userFirstName')) || empty(filter_input(INPUT_GET,'userLastName')))
+if(($userEmail == null) || ($userPassword == null) || ($userFirstName == null) || ($userLastName == null))
 {
     $returnValue["Status"]="400";
     $returnValue["Message"]="Missing required information";
@@ -16,11 +25,7 @@ if(empty(filter_input(INPUT_GET,'userEmail')) || empty(filter_input(INPUT_GET,'u
     return;
     
 } 
-//convert input values to variables
-$userEmail = htmlentities(filter_input(INPUT_GET,'userEmail'));
-$userPassword = htmlentities(filter_input(INPUT_GET,'userPassword'));
-$userFirstName = htmlentities(filter_input(INPUT_GET,'userFirstName'));
-$userLastName = htmlentities(filter_input(INPUT_GET,'userLastName'));
+
 
 //secure password
 $salt = openssl_random_pseudo_bytes(16);
@@ -42,7 +47,7 @@ $dao->openConnection();
 $userDetails = $dao->getUserDetails($userEmail);
 if(!empty($userDetails))
     {
-    $returnValue["Status"]="400";
+    $returnValue["status"]="401";
     $returnValue["Message"]="Email Address Exists";
     echo json_encode($returnValue);
     return;
